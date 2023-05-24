@@ -11,7 +11,43 @@
 </head>
 
 <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg bg-dark sticky-top">
+        <div class="container-fluid ">
+          <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+            <a class="navbar-brand " href="/"><img style="height: 40px" src="{{url_for('static',filename='diet.png')}}"></a>
+          <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              {% if current_user.is_authenticated %}
+              <li class="nav-item">
+                <a class="nav-link text-light" href="/account">Profile</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-light" href="/upload">Upload</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-light" href="/logout">Logout</a>
+              </li>
+              {% else %}
+              <li class="nav-item ">
+                <a class="nav-link text-light" href="/login">Login</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-light" href="/register">Sign Up</a>
+              </li>
+              {% endif %}
+            </ul>
+            <form class="d-flex" role="search" method="POST" action="/search">
+              <input class="form-control me-2 " type="search" placeholder="Search" aria-label="Search" name="query">
+              <button class="btn btn-outline-light" type="submit">Search</button>
+            </form>
+          </div>
+        </div>
+      </nav>
 
+    <!-- Flashed Messages-->
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
         <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
             <path
