@@ -1,5 +1,5 @@
 import base64
-from .forms import PostUploadForm ,UserRegistraionForm, UserLoginForm, UserdataEditForm
+from .forms import PostUploadForm ,UserRegistraionForm, UserLoginForm, UserdataEditForm, PostEditForm
 from flask import request, render_template, redirect, Blueprint, flash, url_for
 from flask_login import login_user, login_required, current_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -53,8 +53,9 @@ def display_post(Title):
         return "No post with THat id", 404
 
 
-@page.route("/del_post/<PID>", methods=["POST"])
-def del_post(PID):
+@page.route("/del_post", methods=["POST"])
+def del_post():
+    PID = request.form.get("pid")
     del_post = post.query.filter_by(PID=PID,UID=current_user.UID).first()
     if del_post:
         post.query.filter_by(PID=PID).delete()
@@ -74,8 +75,45 @@ def search():
     matched_posts = []
     for i in posts:
         query_results_list.append(i.TITLE)
-    search_results = process.extract(search, query_results_list)
+    search_results = process.extract(search, query_results_list, limit=10)
     for title,ratio in search_results:
         Post = post.query.filter_by(TITLE=title).first()
         matched_posts.append(Post)
     return render_template("search.html",posts=matched_posts)
+
+@page.route("/post/edit/<pid>",methods=["GET","POST"])
+def edit_profile(pid):
+    _post = post.query.filter_by(PID=pid).first()
+    if current_user.UID != _post.UID: 
+        flash("You are not the Owner of the post")
+        redirect("/")
+    form = PostEditForm(Post=_post)
+    form.desc.data = _post.PD
+    form.nutri.data = _post.NUTRI
+    form.ing.data = _post.ING 
+    form.recipe.data = _post.RECIPE
+
+    if form.validate_on_submit():
+        if _post.TITLE != form.title.data:_post.TITLE = form.title.data
+        if _post.PD != form.desc.data: _post.PD = _post.desc.data
+        if _post.ING != form.ing.data: _post.ING = _post.ing.data
+        if _post.NUTRI != form.nutri.data: _post.NUTRI = _post.nutri.data
+        if _post.RECIPE != form.recipe.data: _post.RECIPE = form.recipe.data
+        db.session.commit()
+        if form.img.data:
+            db.session.delete(_post.img[0])
+            db.session.commit()
+            pic = form.img.data
+            bufferdata=base64.b64encode(pic.read()).decode('utf-8')
+            new_img = img(NAME=secure_filename(pic.filename),
+                      bufferdata=bufferdata,
+                      mimetype=pic.mimetype,
+                      PID=_post.PID)
+            db.session.add(new_img)
+            db.session.commit()
+        flash("Post Updated Successfully", "success")
+        return redirect("/account")
+    if form.errors != {}:
+        for error in form.errors.values():
+            flash(error[0],"error")
+    return render_template("editpost.html",form=form)

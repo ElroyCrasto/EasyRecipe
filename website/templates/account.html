@@ -22,11 +22,13 @@
                 <p class="card-text text-end"><small class="text-body-secondary">Uploaded on {{post.DATE.date()}}</small></p>
                 <div class="row row-cols-2 ">
                     <div class="col">
-                        <button class="btn-primary btn-sm btn" src="#">Edit</button>
+                        <form method="get" action="/post/edit/{{post.PID}}"> 
+                            <button class="btn-primary btn-sm btn" type="submit" >Edit</button>
+                        </form>
                     </div>
                     <div class="col">
-                        <form method="post" action="/del_post/{{post.PID}}">
-                            <button class="float-end btn-danger btn-sm btn" type="submit" >Delete</button>
+                        <form method="post" action="/del_post">
+                            <button class="float-end btn-danger btn-sm btn" type="submit" name="pid" value="{{post.PID}}">Delete</button>
                         </form>
                     </div>
                 </div>

@@ -3,8 +3,8 @@ from werkzeug.security import check_password_hash
 from wtforms import StringField, TextAreaField, EmailField, PasswordField, SubmitField,SelectField
 from flask_wtf.file import FileField, FileAllowed,FileRequired
 from wtforms.validators import InputRequired, EqualTo, Length, DataRequired, Email, ValidationError, Optional
-from .models import user
-
+from .models import user, post, img
+import base64
 
 class UserRegistraionForm(FlaskForm):
 
@@ -87,3 +87,26 @@ class UserdataEditForm(FlaskForm):
     password1 = PasswordField(label="Password", validators=[Length(min=6), Optional()])
     password2 = PasswordField(label="Confirm Password", validators=[EqualTo("password1","Passwords Do Not Match")])
     submit = SubmitField(label="Save")
+
+class PostEditForm(FlaskForm):
+
+    def __init__(self, Post):
+        super().__init__()
+        self.Post = Post
+
+    def validate_title(self, input):
+        if input.data.strip() != self.Post.TITLE:
+            title_check = post.query.filter_by(TITLE=input.data.strip()).first()
+            if title_check:
+                raise ValidationError("Title already in use")
+
+
+    title = StringField(label="Title", validators=[InputRequired(message="Title Is Required")])
+    img = FileField(label="Upload Thumbnail",
+     validators=[FileAllowed(["jpg", "jpeg", "jfif", "pjpeg", "pjp", "png"],
+            message="Please Upload only Images.(.png,.jpg,jpeg)"), Optional()])
+    desc = StringField(label="Description", validators=[InputRequired(message="Description is Required")])
+    ing = TextAreaField(label="Ingredients")
+    nutri = TextAreaField(label="Nutrition")
+    recipe = TextAreaField(label="Preparation Steps")
+    submit = SubmitField(label="Post")
