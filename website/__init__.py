@@ -28,7 +28,7 @@ def start_app():
     loginManager = LoginManager()
     loginManager.login_view = "account.login"
     loginManager.init_app(app)
-
+    #loginManager.anonymous_user = "Guest"
     @loginManager.user_loader
     def load_user(UID):
         return user.query.get(int(UID))

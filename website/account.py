@@ -78,8 +78,10 @@ def logout():
 
 @account.route("/profile/<username>")
 def  view_profile(username):
-    if current_user.USERNAME == username:
-        return redirect("/account")
+    print(current_user)
+    if not current_user.is_anonymous:
+        if current_user.USERNAME == username:
+            return redirect("/account")
     User = user.query.filter_by(USERNAME=username).first()
     if User:
         return render_template("user_posts.html",user=User)

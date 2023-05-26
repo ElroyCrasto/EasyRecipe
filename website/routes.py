@@ -48,7 +48,8 @@ def display_post(Title):
     _post = post.query.filter_by(TITLE=Title).first()
     if _post:
         _img = img.query.filter_by(PID=_post.PID).first()
-        return render_template("showpost.html", img=_img.bufferdata, mimetype=_img.mimetype, post=_post)
+        postuser = user.query.filter_by(UID=_post.UID).first()
+        return render_template("showpost.html", img=_img.bufferdata, mimetype=_img.mimetype, post=_post, uploader=postuser)
     else:
         return "No post with THat id", 404
 
@@ -81,6 +82,7 @@ def search():
         matched_posts.append(Post)
     return render_template("search.html",posts=matched_posts)
 
+@login_required
 @page.route("/post/edit/<pid>",methods=["GET","POST"])
 def edit_profile(pid):
     _post = post.query.filter_by(PID=pid).first()
